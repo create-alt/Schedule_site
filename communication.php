@@ -30,11 +30,13 @@
         $day = $data->day_info;
         $memo = $data->memo;
 
+        /* js側で処理を追加する際に実装する
         $response = $data;
 
         // 4. echo するとClient-Sideにデータを返却することができる！
         // => JSON形式にして返す
         echo json_encode($response); 
+        */
 
 
         // コメントが空でないことを確認
