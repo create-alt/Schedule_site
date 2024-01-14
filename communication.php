@@ -9,7 +9,7 @@
 
     $dsn = 'mysql:host=localhost;dbname=schedule_management';
     $user = 'root';
-    $password = 'wecrest1001';
+    $password = 'xxxx'; //xxxxはmysql（MariaDB）のパスワード
     //DB接続 各引数にはhost名,dbname,自身のuser名,自身のpasswordを入れる
     $pdo = new PDO($dsn,$user,$password);
 
