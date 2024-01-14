@@ -205,7 +205,16 @@ function sendData(year,mon,day){
             headers: { 'Content-Type': 'application/json' }, // jsonを指定
             body: JSON.stringify(parameter),
         }
-    ) // Serverから返ってきたレスポンスをjsonで受け取って、次のthenに渡す
+    ); 
+    
+    /* 以下はServerから返ってきたレスポンスをjsonで受け取って処理するためのコード（いったん保留）
+    fetch('communication.php', 
+        {
+            method: 'POST', // HTTP-メソッドを指定
+            headers: { 'Content-Type': 'application/json' }, // jsonを指定
+            body: JSON.stringify(parameter),
+        }
+    )
     .then(response => response.json())
     .then(res => {
         // 最終的に返ってきたデータ => Server-Sideでのデータ処理が行われている！
@@ -214,6 +223,6 @@ function sendData(year,mon,day){
     .catch(error => {
         // エラー発生の場合の catch & console出力
         console.log({error});
-    });
+    });*/
 }
 
