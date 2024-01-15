@@ -1,3 +1,4 @@
+//にゃんブログ(https://nyanblog2222.com/programming/javascript/2749/)を参照および引用
 const week = ["日", "月", "火", "水", "木", "金", "土"];
 const today = new Date();
 // 月末だとずれる可能性があるため、1日固定で取得
