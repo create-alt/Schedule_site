@@ -9,7 +9,7 @@
 
     $dsn = 'mysql:host=localhost;dbname=schedule_management';
     $user = 'root';
-    $password = 'xxxx'; //xxxxはmysql（MariaDB）のパスワード
+    $password = 'xxxx'; // xxxxはパスワード
     //DB接続 各引数にはhost名,dbname,自身のuser名,自身のpasswordを入れる
     $pdo = new PDO($dsn,$user,$password);
 
@@ -22,30 +22,26 @@
 
         // 2. JSON形式のデータをデコードする
         // => データをPHP上で処理できるような形にする。
-        $data = json_decode($request_raw_data);
+        $data = json_decode($request_raw_data,true);
 
         // 3. データをPHP(Server-Side)上で処理する！
 
         // key指定でvalueを使用
-        $day = $data->day_info;
-        $memo = $data->memo;
+        $day = $data['day_info'];
+        $memo = $data['memo'];
 
-        /* js側で処理を追加する際に実装する
-        $response = $data;
+        //$response = $data;
 
         // 4. echo するとClient-Sideにデータを返却することができる！
         // => JSON形式にして返す
-        echo json_encode($response); 
-        */
+        //echo $response; 
 
 
         // コメントが空でないことを確認
         if (!empty($memo)) {
-            $stmt = $pdo->prepare("INSERT INTO schedule(memo,DAY) VALUES ({$memo},{$day});");
-            $stmt->bindParam(':memo', $memo, PDO::PARAM_STR); 
-            $stmt->bindParam('DAY', $day, PDO::PARAM_STR);
-    
-            $stmt->execute();
+            $stmt = $pdo->prepare("INSERT INTO schedule (DAY,memo) VALUES (:DAY,:memo);");
+            $params = array(':memo' => $memo,':DAY' => $day);
+            $stmt->execute($params);
         } else {
             echo "予定が設定されていません";
         }
@@ -53,13 +49,22 @@
     }catch(PDOException $e){
         echo $e->getMessage();
     }
-    
-    /*
-    //DBからメモデータを取得する
-    $sql = "SELECT 'memo' FROM 'schedule';";
-    $memo_array = $pdo->query($sql);
-    */
 
+    try{
+        //DBからメモデータを取得する
+        $sql = "SELECT memo FROM schedule WHERE DAY = :DAY";
+        $stmt = $pdo->prepare($sql);
+        $params = array(':DAY' => $day);
+        $stmt->execute($params);
+        $memo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $data['memo'] = $memo['memo'];
+        $response = json_encode($data);
+        
+        echo $response;
+    }catch (PDOException $e) {
+        echo $e->getMessage();
+    } 
     //DBの接続を閉じる
     $pdo = null;
     
