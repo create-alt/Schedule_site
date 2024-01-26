@@ -159,6 +159,7 @@ function createSchedule(year,month,day){
 
     //予定を箇条書きで表示
     var schedule_list = document.createElement("ul");
+    schedule_list.className="schedule_setting";
     var schedule_list_child = document.createElement("li");
 
     //schedule_textにはデータベースから取得した予定一覧を挿入する
@@ -171,6 +172,7 @@ function createSchedule(year,month,day){
     // テキストエリアの追加
     var textarea = document.createElement('textarea');
     textarea.name = 'memo';
+    textarea.id = 'text_setting';
     schedule.appendChild(textarea);
     
 
@@ -182,8 +184,12 @@ function createSchedule(year,month,day){
     button.type = 'submit';
     button.value = '反映させる';
     button.name = 'submitButton';
-    // ボタンがクリックされたときに関数を呼ぶ
-    button.addEventListener('click', {year: year,mon:mon,day:day,handleEvent:sendData});
+    // ボタンがクリックされたときにdbにデータを送信する関数を呼ぶ
+    button.addEventListener('click',function(){
+        sendData(year,mon,day)
+    })
+    //ボタンがクリックされた時にtextarea内の記述内容を消去する関数を呼ぶ
+    button.addEventListener('click',clearText);
     schedule.appendChild(button);
     
     return schedule;
@@ -194,21 +200,15 @@ function sendData(year,mon,day){
 
     // 1. PHP(Server-Side)に渡したいデータ
     const parameter = {
-        day_info: String(year)+"-"+String(mon)+"-"+String(day),
-        memo: textareaContent
+        //Date(year,month -1,day)と渡す！（monthはDate内で0始まりのため一つ前の物を渡す）
+        day_info: new Date(year,mon-1,day).toISOString().split('T')[0],
+        memo: String(textareaContent)
     };
 
     // 2. fetch-APIを使用して、Server-Sideにデータを送信する
     // => fetch(送り先, HTTP通信の情報)
-    fetch('communication.php', 
-        {
-            method: 'POST', // HTTP-メソッドを指定
-            headers: { 'Content-Type': 'application/json' }, // jsonを指定
-            body: JSON.stringify(parameter),
-        }
-    ); 
     
-    /* 以下はServerから返ってきたレスポンスをjsonで受け取って処理するためのコード（いったん保留）
+    // 以下はServerから返ってきたレスポンスをjsonで受け取って処理するためのコード（いったん保留）
     fetch('communication.php', 
         {
             method: 'POST', // HTTP-メソッドを指定
@@ -217,13 +217,29 @@ function sendData(year,mon,day){
         }
     )
     .then(response => response.json())
-    .then(res => {
+    .then(response => {
         // 最終的に返ってきたデータ => Server-Sideでのデータ処理が行われている！
-        memo = res
+        memo = response["memo"];
+
+        //予定を箇条書きで表示
+        var schedule_list = document.createElement("ul");
+        var schedule_list_child = document.createElement("li");
+        
+        var schedule_text = document.createTextNode(memo);
+        //schedule_textにはデータベースから取得した予定一覧を挿入する
+        schedule_list_child.appendChild(schedule_text);
+        schedule_list.appendChild(schedule_list_child);
+        document.querySelector('.schedule_setting').appendchild(schedule_list);
     })
     .catch(error => {
         // エラー発生の場合の catch & console出力
         console.log({error});
-    });*/
+    });
+
+
 }
 
+function clearText(){
+    var textForm = document.getElementById("text_setting");
+    textForm.value = '';
+}
